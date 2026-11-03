@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chromasense"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "color_engine",
+    "fastapi",
+    "uvicorn",
+    "python-multipart",
+    "jinja2",
+    "httpx",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "playwright", "axe-playwright-python", "ruff", "import-linter"]
+
+[tool.setuptools.packages.find]
+include = ["chromasense*"]
+
+[tool.setuptools.package-data]
+chromasense = ["web_ui/**/*", "storage/schema.sql", "ai_gateway/read_schema.json"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = [".", "../color_engine"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.importlinter]
+root_packages = ["chromasense", "color_engine"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Application Core does not import outer parts"
+type = "forbidden"
+source_modules = ["chromasense.core"]
+forbidden_modules = [
+    "chromasense.web_api",
+    "chromasense.storage",
+    "chromasense.ai_gateway",
+    "chromasense.main",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application Core does not import framework, database, or HTTP libraries"
+type = "forbidden"
+source_modules = ["chromasense.core"]
+forbidden_modules = ["fastapi", "sqlite3", "httpx"]
+
+[[tool.importlinter.contracts]]
+name = "Color Engine does not import the portal, framework, database, or HTTP libraries"
+type = "forbidden"
+source_modules = ["color_engine"]
+forbidden_modules = ["chromasense", "fastapi", "httpx", "sqlite3"]
+
+[[tool.importlinter.contracts]]
+name = "Adapters do not import each other"
+type = "independence"
+modules = ["chromasense.web_api", "chromasense.storage", "chromasense.ai_gateway"]

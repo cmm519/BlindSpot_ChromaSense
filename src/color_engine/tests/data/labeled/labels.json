@@ -1,0 +1,371 @@
+{
+ "images": [
+  {
+   "file": "chart_sales.png",
+   "image_type": "chart",
+   "text": [
+    "Quarterly Sales",
+    "North",
+    "South",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      214,
+      39,
+      40
+     ],
+     "North"
+    ],
+    [
+     [
+      44,
+      160,
+      44
+     ],
+     "South"
+    ]
+   ]
+  },
+  {
+   "file": "chart_energy.png",
+   "image_type": "chart",
+   "text": [
+    "Energy Sources",
+    "Solar",
+    "Wind",
+    "Coal",
+    "2021",
+    "2022",
+    "2023"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      230,
+      159,
+      0
+     ],
+     "Solar"
+    ],
+    [
+     [
+      0,
+      114,
+      178
+     ],
+     "Wind"
+    ],
+    [
+     [
+      100,
+      100,
+      100
+     ],
+     "Coal"
+    ]
+   ]
+  },
+  {
+   "file": "chart_survey.png",
+   "image_type": "chart",
+   "text": [
+    "Survey Results",
+    "Students",
+    "Teachers",
+    "Yes",
+    "No",
+    "Maybe"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      200,
+      60,
+      50
+     ],
+     "Students"
+    ],
+    [
+     [
+      90,
+      130,
+      40
+     ],
+     "Teachers"
+    ]
+   ]
+  },
+  {
+   "file": "chart_temperature.png",
+   "image_type": "chart",
+   "text": [
+    "Monthly Temperature",
+    "Lisbon",
+    "Oslo"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      213,
+      94,
+      0
+     ],
+     "Lisbon"
+    ],
+    [
+     [
+      0,
+      158,
+      115
+     ],
+     "Oslo"
+    ]
+   ]
+  },
+  {
+   "file": "map_districts.png",
+   "image_type": "map",
+   "text": [
+    "School Districts",
+    "Ashford",
+    "Brookfield",
+    "Cedar Hill",
+    "Dunmore",
+    "Rural",
+    "Urban"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      170,
+      210,
+      130
+     ],
+     "Rural"
+    ],
+    [
+     [
+      230,
+      190,
+      120
+     ],
+     "Urban"
+    ]
+   ]
+  },
+  {
+   "file": "map_rainfall.png",
+   "image_type": "map",
+   "text": [
+    "Annual Rainfall",
+    "Northern Coast",
+    "Eastern Plains",
+    "Southern Desert",
+    "Wet",
+    "Dry"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      120,
+      170,
+      220
+     ],
+     "Wet"
+    ],
+    [
+     [
+      240,
+      200,
+      120
+     ],
+     "Dry"
+    ]
+   ]
+  },
+  {
+   "file": "map_transit.png",
+   "image_type": "map",
+   "text": [
+    "Transit Zones",
+    "Zone Alpha",
+    "Zone Bravo",
+    "Zone Charlie",
+    "Peak",
+    "Offpeak"
+   ],
+   "shapes": [],
+   "legend": [
+    [
+     [
+      235,
+      150,
+      120
+     ],
+     "Peak"
+    ],
+    [
+     [
+      150,
+      200,
+      160
+     ],
+     "Offpeak"
+    ]
+   ]
+  },
+  {
+   "file": "flat_shapes.png",
+   "image_type": "flat_graphic",
+   "text": [
+    "Road Signs",
+    "Stop",
+    "Go",
+    "Caution"
+   ],
+   "shapes": [
+    {
+     "kind": "circle",
+     "color": [
+      214,
+      39,
+      40
+     ]
+    },
+    {
+     "kind": "rectangle",
+     "color": [
+      44,
+      160,
+      44
+     ]
+    },
+    {
+     "kind": "triangle",
+     "color": [
+      240,
+      180,
+      20
+     ]
+    }
+   ],
+   "legend": []
+  },
+  {
+   "file": "flat_icons.png",
+   "image_type": "flat_graphic",
+   "text": [
+    "Elements",
+    "Water",
+    "Fire"
+   ],
+   "shapes": [
+    {
+     "kind": "rectangle",
+     "color": [
+      0,
+      114,
+      178
+     ]
+    },
+    {
+     "kind": "circle",
+     "color": [
+      213,
+      94,
+      0
+     ]
+    }
+   ],
+   "legend": []
+  },
+  {
+   "file": "flat_badge.png",
+   "image_type": "flat_graphic",
+   "text": [
+    "Status Badges",
+    "Warning",
+    "Safe"
+   ],
+   "shapes": [
+    {
+     "kind": "triangle",
+     "color": [
+      120,
+      60,
+      170
+     ]
+    },
+    {
+     "kind": "circle",
+     "color": [
+      0,
+      158,
+      115
+     ]
+    }
+   ],
+   "legend": []
+  },
+  {
+   "file": "flat_notice.png",
+   "image_type": "flat_graphic",
+   "text": [
+    "Store Hours",
+    "Closed",
+    "Open"
+   ],
+   "shapes": [
+    {
+     "kind": "rectangle",
+     "color": [
+      60,
+      60,
+      60
+     ]
+    },
+    {
+     "kind": "rectangle",
+     "color": [
+      30,
+      120,
+      200
+     ]
+    }
+   ],
+   "legend": []
+  },
+  {
+   "file": "photo_astronaut.jpg",
+   "image_type": "photograph",
+   "text": [],
+   "shapes": [],
+   "legend": []
+  },
+  {
+   "file": "photo_coffee.jpg",
+   "image_type": "photograph",
+   "text": [],
+   "shapes": [],
+   "legend": []
+  },
+  {
+   "file": "photo_cat.jpg",
+   "image_type": "photograph",
+   "text": [],
+   "shapes": [],
+   "legend": []
+  }
+ ]
+}
