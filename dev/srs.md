@@ -101,7 +101,7 @@ Write one testable statement in each row. Add rows until the table lists every m
 - Priority is `must` or `should`.
 - Verification is behavior that you can see or measure and that proves the row.
 
-Each statement ends with its source in `../archive/BlindSpot_ChromaSense_SRS.md`, as a requirement ID or a section or use case number.
+Each statement ends with its source in `srs.md`, as a requirement ID or a section or use case number.
 
 | ID | Statement | Priority | Verification |
 | --- | --- | --- | --- |
