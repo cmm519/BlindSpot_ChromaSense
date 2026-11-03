@@ -2,7 +2,7 @@
 
 **ChromaSense: AI Powered Color Accessibility Web Portal**
 
-Version 2.0
+Version 2.1
 
 **Team BlindSpot**
 
@@ -20,6 +20,7 @@ November 2026
 |---|---|---|---|
 | 1.0 | September 2026 | Initial SRS submission (native iOS application) | Team BlindSpot |
 | 2.0 | November 2026 | Changed the platform to a server-side web portal on the LAN, removed the privacy requirements, and reduced the v1.0 release scope | Team BlindSpot |
+| 2.1 | November 2026 | Recorded the first architecture decision: Clean Architecture and Pipe and Filter | Team BlindSpot |
 
 ## Table of Contents
 
@@ -76,6 +77,7 @@ November 2026
 - [9. Requirements Traceability Matrix](#9-requirements-traceability-matrix)
 - [Appendix A: Out of Scope Items](#appendix-a-out-of-scope-items)
 - [Appendix B: Deferred and Removed Requirements](#appendix-b-deferred-and-removed-requirements)
+- [Appendix C: Architecture Decisions](#appendix-c-architecture-decisions)
 
 ## 1. Introduction
 
@@ -122,7 +124,7 @@ A user opens the portal from a browser on the local network and uploads an image
 
 ### 1.5 Document Overview
 
-Section 2 describes the product context, users, environment, and constraints. Section 3 lists external interface requirements. Section 4 specifies functional requirements by feature. Section 5 specifies non functional requirements. Section 6 presents use cases. Section 7 defines the data requirements. Section 8 lists acceptance criteria and verification methods, and Section 9 contains the traceability matrix. Appendix B records the requirements deferred or removed since Version 1.0.
+Section 2 describes the product context, users, environment, and constraints. Section 3 lists external interface requirements. Section 4 specifies functional requirements by feature. Section 5 specifies non functional requirements. Section 6 presents use cases. Section 7 defines the data requirements. Section 8 lists acceptance criteria and verification methods, and Section 9 contains the traceability matrix. Appendix B records the requirements deferred or removed since Version 1.0, and Appendix C records architecture decisions.
 
 Requirement IDs from Version 1.0 are kept stable, so gaps in the numbering are expected. Each missing ID is listed in Appendix B.
 
@@ -402,7 +404,7 @@ The targets in NFR-6.2 and NFR-6.3 are provisional until the enhancement and AI 
 | ID | Requirement |
 |---|---|
 | NFR-7.1 | The color engine shall be a separate Python package with unit tests covering at least 70 percent of its code. |
-| NFR-7.2 | The codebase shall follow a documented layered architecture and consistent style rules. |
+| NFR-7.2 | The codebase shall follow the architecture documented in Appendix C and consistent style rules. |
 | NFR-7.3 | Every pull request shall pass automated builds and tests before merging. |
 | NFR-7.4 | The color engine shall not depend on the web framework, to allow future reuse in other products. |
 
@@ -543,3 +545,11 @@ Deferred items may return in a later release. Removed items no longer apply to t
 | NFR-5.1 | On device features remain available without network access | Removed | Processing runs on the server |
 | UC-4 | Take the calibration test | Deferred | FR-10 deferred |
 | UC-5 | Use live camera mode | Deferred | FR-11 deferred |
+
+## Appendix C: Architecture Decisions
+
+### Decision 1: Clean Architecture and Pipe and Filter
+
+The system shall use Clean Architecture (Robert C. Martin) for the overall structure and Pipe and Filter for the processing pipeline. Source dependencies point inward, so the color rules and use cases do not depend on the web framework, storage, or AI provider. A use case runs the pipeline as a one-way sequence of independent filters: decode, downscale, confusion detection, and enhancement. AI interpretation is a separate use case and is not a pipeline filter.
+
+This decision supports FR-1.7, NFR-7.1, NFR-7.2, and NFR-7.4. The design rules are in `dev/clean-architecture.mini.md`, and the full decision record is in `dev/architecture.md`.

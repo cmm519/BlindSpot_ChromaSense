@@ -55,10 +55,10 @@ Record one to three decisions that you already made. Delete the unused decision 
 
 ### Decision 1
 
-- **Context**: {{FILL: the force that required a choice}}
-- **Decision**: {{FILL: what you chose}}
-- **Rejected**: {{FILL: what you did not choose, and why}}
-- **SRS IDs**: {{FILL: IDs this decision serves, or none}}
+- **Context**: ChromaSense's color rules must stay testable and replaceable while the web framework, storage, and AI provider may change. An upload also needs to run through a fixed sequence of image processing stages.
+- **Decision**: Use Clean Architecture (Robert C. Martin) for the overall structure, and Pipe and Filter for the processing pipeline. Source dependencies point inward, so the color rules and use cases do not import the web framework, storage, or AI provider. A use case runs the pipeline as a one-way sequence of independent filters: decode, downscale, confusion detection, and enhancement. AI interpretation is a separate use case and is not a pipeline filter.
+- **Rejected**: A framework-centered design with pipeline logic in web request handlers, because it would tie the color rules to the framework and make them harder to test and reuse.
+- **SRS IDs**: FR-1.7, NFR-7.1, NFR-7.2, NFR-7.4
 
 ### Decision 2
 
@@ -82,4 +82,4 @@ Write one path that ends in `.mini.md`, or write `none`. Do not list two books. 
 
 Before you select, read `user resources/HOW-TO-agent-rules-books.md` and `user resources/ARCHITECTURE-NOTES.md`.
 
-{{FILL: one mini.md path, or none}}
+clean-architecture.mini.md
