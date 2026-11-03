@@ -172,7 +172,6 @@ Write one testable statement in each row. Add rows until the table lists every m
 | SRS-NFR-003 | Confusion detection shall complete in under 500 milliseconds on a downscaled image on the reference host. (NFR-1.2) | should | A timing test of detection on a downscaled image in the reference container reports under 500 milliseconds. |
 | SRS-NFR-004 | AI interpretation, including the second read of shape and text items, shall return a result within 30 seconds under normal network conditions. (NFR-1.4; inferred severe low-vision requirement) | should | Timed Explain requests against the real provider on a normal connection each return with verification flags within 30 seconds. |
 | SRS-NFR-005 | The home page shall become interactive within 2 seconds on the LAN in the reference browser. (NFR-1.5) | must | Chrome performance profiling from a second LAN device reports time to interactive under 2 seconds. |
-| SRS-NFR-006 | Traffic between the server and the AI provider shall use HTTPS with TLS 1.2 or later. (NFR-2.1) | must | The configured provider URL is `https`, and the client rejects connections below TLS 1.2. |
 | SRS-NFR-007 | API keys for third party services shall reside only on the server. (NFR-2.2) | must | A search of browser delivered assets and API responses finds no API key. |
 | SRS-NFR-008 | The server shall validate all inputs. (NFR-2.3) | must | Requests with invalid IDs, profile values, and coordinates each receive a client error response and do not cause a server error. |
 | SRS-NFR-009 | The server shall limit image upload size to 10 MB. (NFR-2.3) | must | An upload over 10 MB is rejected with an error message, and a 10 MB upload is accepted. |
@@ -223,7 +222,6 @@ Inputs and outputs that cross the software boundary, if the product perspective 
 **Communication**
 
 - Browsers reach the portal over HTTP on port 9090. Plain HTTP is permitted on the LAN for this release.
-- Calls from the server to the AI provider use HTTPS with TLS 1.2 or later.
 - The server exposes a REST API with JSON payloads, plus multipart upload and image responses.
 - Requests are not authenticated. The browser sends the CVD profile with each request that needs it.
 
