@@ -44,7 +44,7 @@ flowchart TB
   core -->|"Pixel arrays, CVD profile, palette"| engine
   core -->|"Port: images, interpretations, AI usage"| storage
   core -->|"Port: image, palette, and question to structured read"| gateway
-  gateway -->|"HTTPS, TLS 1.2 or later"| provider
+  gateway -->|"Provider API calls"| provider
   main -->|"Constructs and wires"| webApi
   main -->|"Constructs and wires"| core
   main -->|"Constructs and wires"| storage
@@ -60,7 +60,7 @@ Name each major part and its job. The agent must not add a part that is not in t
 - **Application Core**: Use cases and the policy they need, organized by application action: process upload, reanalyze for profile, render view, identify color, export, interpret image, answer question, and purge expired data. Runs the pipeline, validates and verifies AI items, enforces rate limits and the spend cap, and owns the ports for storage, AI, and the clock.
 - **Color Engine**: Separate, installable Python package of pipeline filters and color rules: decode, sRGB conversion, downscale, CVD simulation, palette extraction, CIEDE2000 distance, confusion detection, masking, enhancement, pattern overlays, and color naming from the bundled dataset.
 - **Storage Adapter**: Implements the storage ports. Keeps temporary images on the filesystem, and keeps cached interpretations and AI usage in SQLite.
-- **AI Gateway**: Implements the AI port. Holds the provider API key, builds the provider request, enforces HTTPS and TLS 1.2 or later, and maps the provider's response or failure to plain core models. It is the only part that calls the provider.
+- **AI Gateway**: Implements the AI port. Holds the provider API key, builds the provider request, and maps the provider's response or failure to plain core models. It is the only part that calls the provider.
 - **Server Main**: Composition root. Reads configuration, constructs the parts and wires them together, starts the server on port 9090, and schedules the purge of expired data.
 
 ## Optional: Classes and functions

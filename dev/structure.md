@@ -202,8 +202,7 @@ Use these where a requirement or decision already depends on them. The agent mus
 | Standard library | `concurrent.futures.ThreadPoolExecutor` for the two reads | `core/use_cases/interpret_image.py` | SRS-FR-057, SRS-NFR-004 |
 | Standard library | `sqlite3.connect` | `storage/` | SRS-FR-047, SRS-FR-048, SRS-NFR-010, SRS-NFR-011 |
 | Standard library | `pathlib.Path` | `storage/filesystem_image_store.py` | SRS-FR-010 |
-| `httpx` | `httpx.Client` with `verify` set to an SSL context | `ai_gateway/http_vision_reader.py` | SRS-FR-046, SRS-NFR-006 |
-| Standard library | `ssl.create_default_context`, `minimum_version = ssl.TLSVersion.TLSv1_2` | `ai_gateway/http_vision_reader.py` | SRS-NFR-006 |
+| `httpx` | `httpx.Client` | `ai_gateway/http_vision_reader.py` | SRS-FR-046 |
 | `fastapi` | `FastAPI` with `lifespan`, `APIRouter`, `UploadFile`, `Depends`, `Response.set_cookie` | `web_api/`, `main/wiring.py` | SRS-FR-049, SRS-NFR-008 |
 | `fastapi` | `fastapi.staticfiles.StaticFiles`, `fastapi.templating.Jinja2Templates` | `web_api/routers/pages.py` | SRS-NFR-005 |
 | `python-multipart` | Required by `UploadFile` | `web_api/routers/images.py` | SRS-FR-001 |
