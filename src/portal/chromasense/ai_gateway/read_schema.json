@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["chart_type", "legend", "text_items", "shape_items", "summary"],
+  "properties": {
+    "chart_type": {"type": "string"},
+    "legend": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["palette_id", "text"],
+        "properties": {
+          "palette_id": {"type": ["integer", "null"]},
+          "text": {"type": "string"}
+        }
+      }
+    },
+    "text_items": {
+      "type": "array",
+      "description": "One item per line of text in the image, in reading order.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text"],
+        "properties": {
+          "text": {"type": "string"}
+        }
+      }
+    },
+    "shape_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "palette_id"],
+        "properties": {
+          "kind": {"type": "string", "enum": ["circle", "rectangle", "triangle", "other"]},
+          "palette_id": {"type": ["integer", "null"]}
+        }
+      }
+    },
+    "summary": {"type": "string"}
+  }
+}

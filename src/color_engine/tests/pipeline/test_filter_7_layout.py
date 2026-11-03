@@ -36,7 +36,7 @@ _cache = {}
 def _analyze(label) -> tuple[LayoutResult7, Palette3]:
     if label["file"] not in _cache:
         pixels = np.array(Image.open(LABELED / label["file"]).convert("RGB"))
-        palette = extract_palette_3(pixels, 8)
+        palette = extract_palette_3(pixels, 12)
         regions = find_regions_4(pixels, palette)
         _cache[label["file"]] = (
             analyze_layout_7(pixels, palette, regions, read_text_6(pixels)),

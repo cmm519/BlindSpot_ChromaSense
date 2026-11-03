@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Introduction to ChromaSense{% endblock %}
+{% block main %}
+<h1>Introduction</h1>
+<section aria-labelledby="profiles-heading">
+  <h2 id="profiles-heading">CVD profiles</h2>
+  <p>Color vision deficiency (CVD) changes which colors look alike. A CVD profile tells ChromaSense which colors to check for you. It has two parts:</p>
+  <ul>
+    <li><strong>Type:</strong> protan, deutan, tritan, or achromatopsia. Choose no CVD if color is not what you need help with. You still get the color list, shapes, text, color identification, and AI interpretation.</li>
+    <li><strong>Severity:</strong> a value from 0 to 1, where 1 is complete.</li>
+  </ul>
+  <p>Your profile stays in this browser. You can change it on the <a data-keep-image href="/settings">Settings page</a>. ChromaSense does not diagnose CVD. To learn about your own color vision, ask an eye care professional.</p>
+</section>
+<section aria-labelledby="enhancement-heading">
+  <h2 id="enhancement-heading">Enhancement</h2>
+  <p>A global color filter changes a whole image. ChromaSense first finds the pairs of colors that your profile makes hard to tell apart. It then changes only those colors, by moving them apart in lightness, and it leaves the rest of the image alone.</p>
+  <p>You can compare the original and enhanced images, change the strength, add a pattern to each confusable color group, and download the enhanced image.</p>
+</section>
+{% endblock %}

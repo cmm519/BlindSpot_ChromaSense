@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}ChromaSense simulator{% endblock %}
+{% block main %}
+<h1>CVD simulator</h1>
+{% if image_id %}
+<div id="simulator" data-image-id="{{ image_id }}">
+  <p>See how this image appears under each CVD type. A change here does not change your saved profile.</p>
+  <p id="simulator-error" class="error" hidden></p>
+  <p id="simulator-summary"></p>
+  <p>
+    <label for="simulator-type">CVD type</label>
+    <select id="simulator-type">
+      <option value="protan">Protan</option>
+      <option value="deutan">Deutan</option>
+      <option value="tritan">Tritan</option>
+      <option value="achromatopsia">Achromatopsia</option>
+    </select>
+  </p>
+  <p>
+    <label for="simulator-severity">Severity, from 0 (none) to 1 (complete)</label>
+    <input id="simulator-severity" type="range" min="0" max="1" step="0.05" value="1">
+    <output id="simulator-severity-value" for="simulator-severity">1</output>
+  </p>
+  <p id="achromatopsia-note" hidden>Achromatopsia is shown at full severity, because the model has no partial form.</p>
+  <div class="side-by-side">
+    <figure>
+      <img id="simulator-original" alt="" aria-describedby="simulator-summary">
+      <figcaption>Original</figcaption>
+    </figure>
+    <figure>
+      <img id="simulator-simulated" alt="" aria-describedby="simulator-summary">
+      <figcaption id="simulator-caption">Simulated</figcaption>
+    </figure>
+  </div>
+  <h2>Confusable pairs</h2>
+  <ul id="simulator-pair-list" class="item-list"></ul>
+  <p id="simulator-pair-empty" hidden>No confusable pairs for this selection.</p>
+  <p><a href="/workspace/{{ image_id }}">Return to your image</a></p>
+</div>
+{% else %}
+<p>Upload an image first, and then open it in the simulator. <a href="/">Go to the home page to upload an image</a>.</p>
+{% endif %}
+{% endblock %}

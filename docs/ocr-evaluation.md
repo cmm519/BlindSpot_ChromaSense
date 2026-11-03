@@ -26,9 +26,11 @@ Timings ran in the `dev` container with the 4 CPU reference limit, on one chart 
 | Tesseract, automatic layout (`--psm 3`), adaptive threshold, 2x | 26 of 55 | 47.3 | 10 | not timed |
 | Tesseract, single block (`--psm 6`), no threshold, 2x | 23 of 55 | 41.8 | 9 | not timed |
 
-The filter that ships adds one step to the engine's output: it rejoins a line that the engine split at a word gap, because one piece is one line. With that step it still scores 53 of 55 lines, with 2 lines not expected. The 2 missed lines are `Monthly Temperature` and `Store Hours`.
+The filter that ships adds one step to the engine's output: it rejoins a line that the engine split at a word gap, because one piece is one line. With that step it still scores 53 of 55 lines, with 2 lines not expected. The 2 missed lines are `Monthly Temperature` and `Store Hours`, which the engine read as `MonthlyTemperature` and `StoreHours`.
 
 The engine can still misread text. On white text on a blue background, it read `Revenue by Region` as `Revenue by f Region`. This is why each text item stays unverified until an AI read agrees with it.
+
+A dropped space has one more effect. Verification normalizes case and whitespace but does not remove spaces, so `StoreHours` does not agree with an AI read of `Store Hours`. The item stays unverified, which is the safe result, but the user gets no verified flag for that line.
 
 ## Selection rule
 

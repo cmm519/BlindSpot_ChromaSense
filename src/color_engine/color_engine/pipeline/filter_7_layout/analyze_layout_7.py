@@ -24,14 +24,18 @@ _HISTOGRAM_BINS = 16
 _HISTOGRAM_MIN_SHARE = 0.0005
 _COVERAGE_LAB_DISTANCE = 6.0
 
-# Image type rules.
-_PHOTO_MAX_COVERAGE = 0.70
-_PHOTO_MIN_OCCUPIED_BINS = 0.04
+# Image type rules. The values come from the measurements on tests/data/labeled/.
+_PHOTO_MAX_COVERAGE = 0.80
+_PHOTO_MIN_OCCUPIED_BINS = 0.02
+_PHOTO_MIN_REGIONS = 100
 _AXIS_MIN_LENGTH_SHARE = 0.5
 _AXIS_ANGLE_TOLERANCE = pi / 90
+_CHART_MIN_TEXT_PIECES = 1
 _MAP_MIN_IRREGULAR_REGIONS = 2
-_MAP_MIN_REGION_SHARE = 0.02
-_IRREGULAR_MAX_FILL = 0.85
+_MAP_MIN_REGION_SHARE = 0.05
+_MAP_MAX_REGION_SHARE = 0.5
+# Share of its box that a regular shape fills: a rectangle, a circle, and a triangle.
+_REGULAR_FILLS = ((1.0, 0.03), (pi / 4, 0.012), (0.5, 0.03))
 
 # Legend rules.
 _SWATCH_MAX_IMAGE_SHARE = 0.015
@@ -47,18 +51,17 @@ def analyze_layout_7(
 ) -> LayoutResult7:
     image = np.asarray(pixels)
     legend = _find_legend(regions, text, image.shape[0] * image.shape[1])
-    return LayoutResult7(_classify(image, palette, regions), legend)
+    return LayoutResult7(_classify(image, palette, regions, text), legend)
 
 
-def _classify(image: NDArray, palette: Palette3, regions: RegionMap4) -> ImageType:
+def _classify(image: NDArray, palette: Palette3, regions: RegionMap4, text: TextSet6) -> ImageType:
     small = _feature_copy(image)
-    if _looks_photographic(small, palette):
+    if _looks_photographic(small, palette, regions):
         return ImageType.PHOTOGRAPH
-    if _has_axes(small):
+    if len(text.items) >= _CHART_MIN_TEXT_PIECES and _has_axes(small):
         return ImageType.CHART
-    if _irregular_region_count(regions, image.shape[0] * image.shape[1]) >= (
-        _MAP_MIN_IRREGULAR_REGIONS
-    ):
+    image_area = image.shape[0] * image.shape[1]
+    if _irregular_region_count(regions, image_area) >= _MAP_MIN_IRREGULAR_REGIONS:
         return ImageType.MAP
     return ImageType.FLAT_GRAPHIC
 
@@ -71,7 +74,7 @@ def _feature_copy(image: NDArray) -> NDArray:
     return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
 
 
-def _looks_photographic(small: NDArray, palette: Palette3) -> bool:
+def _looks_photographic(small: NDArray, palette: Palette3, regions: RegionMap4) -> bool:
     labs = rgb2lab(small)
     centers = np.array([entry.lab for entry in palette.entries])
     distances = np.linalg.norm(labs[:, :, np.newaxis, :] - centers, axis=-1).min(axis=-1)
@@ -82,7 +85,11 @@ def _looks_photographic(small: NDArray, palette: Palette3) -> bool:
     )
     minimum = _HISTOGRAM_MIN_SHARE * small.shape[0] * small.shape[1]
     occupied = float((histogram > minimum).sum()) / histogram.size
-    return coverage < _PHOTO_MAX_COVERAGE and occupied >= _PHOTO_MIN_OCCUPIED_BINS
+    return (
+        coverage < _PHOTO_MAX_COVERAGE
+        and occupied >= _PHOTO_MIN_OCCUPIED_BINS
+        and len(regions.regions) >= _PHOTO_MIN_REGIONS
+    )
 
 
 def _has_axes(small: NDArray) -> bool:
@@ -102,13 +109,16 @@ def _line_at_angle(edges: NDArray, votes: int, angle: float) -> bool:
 
 
 def _irregular_region_count(regions: RegionMap4, image_area: int) -> int:
-    """Count large regions that do not fill their box, such as the areas of a map."""
+    """Count large regions that are not a rectangle, circle, or triangle, as in a map."""
     return sum(
-        region.area >= _MAP_MIN_REGION_SHARE * image_area
-        and region.area < image_area * 0.5
-        and region.area / (region.width * region.height) < _IRREGULAR_MAX_FILL
+        _MAP_MIN_REGION_SHARE * image_area <= region.area < _MAP_MAX_REGION_SHARE * image_area
+        and not _has_regular_fill(region.area / (region.width * region.height))
         for region in regions.regions
     )
+
+
+def _has_regular_fill(fill: float) -> bool:
+    return any(abs(fill - regular) <= tolerance for regular, tolerance in _REGULAR_FILLS)
 
 
 def _find_legend(regions: RegionMap4, text: TextSet6, image_area: int) -> tuple[LegendEntry7, ...]:

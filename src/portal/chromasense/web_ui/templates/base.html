@@ -1,0 +1,50 @@
+{% macro profile_fields(prefix) %}
+<fieldset>
+  <legend>Color vision</legend>
+  <p><label><input type="radio" name="{{ prefix }}-type" value="protan"> Protan (red-weak or red-blind)</label></p>
+  <p><label><input type="radio" name="{{ prefix }}-type" value="deutan"> Deutan (green-weak or green-blind)</label></p>
+  <p><label><input type="radio" name="{{ prefix }}-type" value="tritan"> Tritan (blue-weak or blue-blind)</label></p>
+  <p><label><input type="radio" name="{{ prefix }}-type" value="achromatopsia"> Achromatopsia (no color vision)</label></p>
+  <p><label><input type="radio" name="{{ prefix }}-type" value="none"> No CVD</label></p>
+</fieldset>
+<p>
+  <label for="{{ prefix }}-severity">Severity, from 0 (none) to 1 (complete)</label>
+  <input id="{{ prefix }}-severity" name="{{ prefix }}-severity" type="range" min="0" max="1" step="0.05" value="1">
+  <output id="{{ prefix }}-severity-value" for="{{ prefix }}-severity">1</output>
+</p>
+{% endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ChromaSense{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script defer src="/static/js/announce.js"></script>
+  <script defer src="/static/js/profile.js"></script>
+  <script defer src="/static/js/speech.js"></script>
+  <script defer src="/static/js/color_point.js"></script>
+  <script defer src="/static/js/ai_panel.js"></script>
+  <script defer src="/static/js/workspace.js"></script>
+  <script defer src="/static/js/upload.js"></script>
+  <script defer src="/static/js/simulator.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header>
+    <p class="brand"><a href="/">ChromaSense</a></p>
+    <nav aria-label="Main">
+      <ul>
+        <li><a data-keep-image href="/{% if image_id %}?image_id={{ image_id }}{% endif %}">Home</a></li>
+        <li><a data-keep-image href="/simulator{% if image_id %}?image_id={{ image_id }}{% endif %}">Simulator</a></li>
+        <li><a data-keep-image href="/settings{% if image_id %}?image_id={{ image_id }}{% endif %}">Settings</a></li>
+        <li><a data-keep-image href="/intro{% if image_id %}?image_id={{ image_id }}{% endif %}">Introduction</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+  <main id="main" tabindex="-1">
+    {% block main %}{% endblock %}
+  </main>
+</body>
+</html>

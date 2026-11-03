@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "base.html" import profile_fields %}
+{% block title %}ChromaSense: upload an image{% endblock %}
+{% block main %}
+<h1>Understand color in your images</h1>
+<p>Upload a chart, map, or flat graphic. ChromaSense finds the colors, shapes, and text, and makes confusable colors easier to tell apart. New to this? Read the <a href="/intro">introduction</a>.</p>
+<section id="upload-section" aria-labelledby="upload-heading">
+  <h2 id="upload-heading">Upload an image</h2>
+  <div id="drop-zone" class="drop-zone">
+    <p><label for="file-input">Choose a PNG, JPEG, HEIC, or WEBP image, up to 10 MB</label></p>
+    <p><input id="file-input" type="file" accept="image/png,image/jpeg,image/heic,image/heif,image/webp,.heic,.heif"></p>
+    <p>You can also drop an image file here, or paste a copied image anywhere on this page.</p>
+  </div>
+  <p id="upload-error" class="error" hidden></p>
+</section>
+<p>To see how an image looks under each CVD type, upload it, and then open the <a data-keep-image href="/simulator">simulator</a>.</p>
+<dialog id="profile-dialog" aria-labelledby="profile-dialog-heading">
+  <form id="profile-dialog-form" method="dialog">
+    <h2 id="profile-dialog-heading">Choose your color vision profile</h2>
+    <p>ChromaSense needs a profile before it can analyze your image. You can change it later on the Settings page.</p>
+    {{ profile_fields("prompt") }}
+    <p id="profile-dialog-error" class="error" hidden>Choose one option.</p>
+    <p class="button-row">
+      <button type="submit" value="confirm">Continue</button>
+      <button type="button" id="profile-dialog-cancel">Cancel the upload</button>
+    </p>
+  </form>
+</dialog>
+<section id="workspace-section" aria-label="Image workspace" hidden></section>
+{% endblock %}

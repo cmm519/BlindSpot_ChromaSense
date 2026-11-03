@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}ChromaSense image workspace{% endblock %}
+{% block main %}
+<div id="workspace" data-image-id="{{ image_id }}">
+  <h1>Image workspace</h1>
+  <p id="workspace-error" class="error" hidden></p>
+  <p id="analysis-summary"></p>
+  <p id="interpretation-summary" hidden></p>
+  <p id="best-effort-message" class="notice" hidden>This looks like a photograph. Charts, maps, and flat graphics are the supported target, so results for a photograph are best effort.</p>
+  <p id="no-enhancement-message" class="notice" hidden>No confusable colors were found for your profile, so no enhancement is needed.</p>
+  <p id="no-cvd-message" class="notice" hidden>No CVD is selected, so this shows the original image. The before and after view, strength, overlay, and download need a CVD type, which you can set on the Settings page.</p>
+  <p id="remaining-pairs" hidden></p>
+
+  <section aria-labelledby="view-heading">
+    <h2 id="view-heading">Image</h2>
+    <div id="point-area" class="point-area" tabindex="0" role="group"
+         aria-label="Color point. Click or tap a point, or use the arrow keys to move the point and hear its color. Press N or P for the next or previous region."
+         aria-describedby="analysis-summary">
+      <img id="base-image" class="image-base" alt="" aria-describedby="analysis-summary">
+      <img id="top-image" class="image-top" alt="" aria-describedby="analysis-summary" hidden>
+      <span id="point-mark" class="point-mark" hidden></span>
+    </div>
+    <p id="point-position">Point not placed yet.</p>
+    <div id="enhancement-controls">
+      <p>
+        <label for="compare-slider">Before and after: percent of the enhanced image shown</label>
+        <input id="compare-slider" type="range" min="0" max="100" step="1" value="100">
+        <output id="compare-value" for="compare-slider">100</output>
+      </p>
+      <p>
+        <label for="strength-slider">Enhancement strength, in percent</label>
+        <input id="strength-slider" type="range" min="0" max="100" step="5" value="100">
+        <output id="strength-value" for="strength-slider">100</output>
+      </p>
+      <p><label><input id="overlay-toggle" type="checkbox"> Show a pattern on each confusable color group</label></p>
+      <p><a id="download-link" class="button" download>Download the enhanced image</a></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="color-heading">
+    <h2 id="color-heading">Color at the point</h2>
+    <div id="color-result"><p>No color identified yet.</p></div>
+    <div class="speech-controls" data-speech-source="color" data-speech-target="color-result" data-speech-label="color result"></div>
+  </section>
+
+  <section aria-labelledby="pairs-heading">
+    <h2 id="pairs-heading">Confusable pairs</h2>
+    <ul id="pair-list" class="item-list"></ul>
+    <p id="pair-empty" hidden>No confusable pairs.</p>
+  </section>
+
+  <section id="local-results" aria-labelledby="local-heading">
+    <h2 id="local-heading">Local analysis</h2>
+    <p id="image-type"></p>
+    <h3>Colors</h3>
+    <ul id="color-list" class="item-list"></ul>
+    <h3>Text, in reading order</h3>
+    <ul id="text-list" class="item-list"></ul>
+    <p id="text-empty" hidden>No text was found.</p>
+    <h3>Shapes</h3>
+    <ul id="shape-list" class="item-list"></ul>
+    <p id="shape-empty" hidden>No shapes were found.</p>
+    <h3>Legend</h3>
+    <ul id="legend-list" class="item-list"></ul>
+    <p id="legend-empty" hidden>No legend was found.</p>
+    <details>
+      <summary>Regions</summary>
+      <ul id="region-list" class="item-list"></ul>
+    </details>
+  </section>
+  <div class="speech-controls" data-speech-source="local" data-speech-target="local-results" data-speech-label="local analysis"></div>
+
+  <section id="ai-panel" aria-labelledby="ai-heading">
+    <h2 id="ai-heading">AI interpretation</h2>
+    <p>AI runs only when you click Explain. It sends this image to a third party AI service.</p>
+    <p><button id="explain-button" type="button">Explain</button></p>
+    <p id="ai-message" class="notice" hidden></p>
+    <section id="flag-explanation" tabindex="0" aria-labelledby="flag-heading">
+      <h3 id="flag-heading">What the flags mean</h3>
+      <ul>
+        <li>A verified color was checked against the image's pixels.</li>
+        <li>Verified text or a verified shape means that the AI read and the local analysis agreed.</li>
+        <li>Neither guarantees that an item is correct. Do not use results for medical, medication, or safety decisions.</li>
+      </ul>
+    </section>
+    <div id="ai-results" hidden>
+      <h3>Chart type</h3>
+      <p id="ai-chart-type"></p>
+      <h3>Summary</h3>
+      <p id="ai-summary"></p>
+      <h3>Legend</h3>
+      <ul id="ai-legend" class="item-list"></ul>
+      <h3>Text</h3>
+      <ul id="ai-text" class="item-list"></ul>
+      <h3>Shapes</h3>
+      <ul id="ai-shapes" class="item-list"></ul>
+      <h3>Colors</h3>
+      <ul id="ai-colors" class="item-list"></ul>
+    </div>
+    <form id="question-form">
+      <p>
+        <label for="question-input">Ask a question about this image</label>
+        <input id="question-input" type="text" maxlength="1000" autocomplete="off">
+      </p>
+      <p><button id="question-button" type="submit">Ask</button></p>
+    </form>
+    <div id="ai-answers">
+      <h3 id="answers-heading" hidden>Answers</h3>
+      <ul id="answer-list" class="item-list"></ul>
+    </div>
+    <div class="speech-controls" data-speech-source="ai" data-speech-target="ai-panel-spoken" data-speech-label="AI response"></div>
+  </section>
+  <p><a id="simulator-link">Open this image in the simulator</a></p>
+</div>
+{% endblock %}

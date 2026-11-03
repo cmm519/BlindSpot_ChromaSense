@@ -33,3 +33,6 @@ color_engine = ["data/*"]
 
 [tool.ruff]
 extend = "../portal/pyproject.toml"
+
+[tool.coverage.run]
+source_pkgs = ["color_engine"]

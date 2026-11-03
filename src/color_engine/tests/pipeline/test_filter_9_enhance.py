@@ -101,7 +101,7 @@ def test_invalid_strength_is_rejected(strength):
 def test_redetection_on_the_hand_built_result_finds_no_pair():
     pixels, confusion = _hand_built()
     enhanced = enhance_9(pixels, confusion).pixels
-    palette = extract_palette_3(enhanced, 8)
+    palette = extract_palette_3(enhanced, 12)
     profile = CvdProfile(CvdType.DEUTAN, 1.0)
     assert detect_confusion_8(enhanced, palette, profile, THRESHOLD).pairs == ()
 
@@ -120,14 +120,14 @@ def _dataset_counts() -> dict[CvdType, tuple[int, int]]:
     counts = {cvd_type: (0, 0) for cvd_type in CVD_TYPES}
     for label in labels:
         pixels = np.array(Image.open(FLAT_GRAPHICS / label["file"]).convert("RGB"))
-        palette = extract_palette_3(pixels, 8)
+        palette = extract_palette_3(pixels, 12)
         for cvd_type in CVD_TYPES:
             profile = CvdProfile(cvd_type, 1.0)
             confusion = detect_confusion_8(pixels, palette, profile, THRESHOLD)
             enhanced = enhance_9(pixels, confusion).pixels
             assert not _changed(pixels, enhanced)[~confusion.mask].any()
             remaining = detect_confusion_8(
-                enhanced, extract_palette_3(enhanced, 8), profile, THRESHOLD
+                enhanced, extract_palette_3(enhanced, 12), profile, THRESHOLD
             )
             before, after = counts[cvd_type]
             counts[cvd_type] = (before + len(confusion.pairs), after + len(remaining.pairs))
@@ -138,5 +138,6 @@ def test_enhancement_reduces_pairs_by_at_least_80_percent_on_the_dataset():
     counts = _dataset_counts()
     before = sum(pair[0] for pair in counts.values())
     after = sum(pair[1] for pair in counts.values())
+    print(f"SRS-NFR-024: {before} pairs before, {after} after, {1 - after / before:.1%} reduction")
     assert all(pair[0] > 0 for pair in counts.values()), "each CVD type must have flagged pairs"
     assert 1 - after / before >= 0.80

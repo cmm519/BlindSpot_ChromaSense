@@ -1,0 +1,325 @@
+:root {
+  --text: #1a1a1a;
+  --muted: #444;
+  --paper: #fff;
+  --panel: #f3f4f6;
+  --line: #5b6470;
+  --link: #0b4fa8;
+  --focus: #0b4fa8;
+  --error: #9b1c1c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+a {
+  color: var(--link);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.5rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  margin: 0;
+  font-weight: 700;
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+section {
+  margin-block: 1.5rem;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  max-width: 100%;
+  min-width: 0;
+}
+
+button,
+.button {
+  display: inline-block;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--link);
+  border-radius: 4px;
+  background: var(--link);
+  color: #fff;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.speech-controls button {
+  background: var(--paper);
+  color: var(--link);
+}
+
+input[type="range"] {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  min-height: 2rem;
+  accent-color: var(--link);
+}
+
+input[type="text"] {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--line);
+  font: inherit;
+}
+
+input[type="file"] {
+  max-width: 100%;
+}
+
+select {
+  display: block;
+  min-height: 2.75rem;
+  max-width: 100%;
+  font: inherit;
+}
+
+label input[type="radio"],
+label input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  vertical-align: middle;
+}
+
+.skip-link {
+  position: absolute;
+  left: -100vw;
+  top: 0;
+  padding: 0.5rem 1rem;
+  background: var(--paper);
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.drop-zone {
+  padding: 1rem;
+  border: 2px dashed var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+}
+
+.drop-zone.is-over {
+  border-style: solid;
+  border-width: 4px;
+}
+
+.error {
+  padding: 0.5rem 0.75rem;
+  border-left: 6px solid var(--error);
+  color: var(--error);
+  font-weight: 600;
+}
+
+.notice {
+  padding: 0.5rem 0.75rem;
+  border-left: 6px solid var(--line);
+  background: var(--panel);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.point-area {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  cursor: crosshair;
+  line-height: 0;
+}
+
+.point-area img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.image-top {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.point-mark {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  transform: translate(-50%, -50%);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  outline: 3px solid #000;
+  pointer-events: none;
+}
+
+.item-list {
+  padding-left: 1.25rem;
+}
+
+.item-list li {
+  margin-block: 0.5rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.35rem;
+  border: 1px solid #000;
+  vertical-align: middle;
+  forced-color-adjust: none;
+}
+
+.flag {
+  padding: 0 0.3rem;
+  border: 1px solid currentcolor;
+  font-weight: 700;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.speech-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block: 0.75rem;
+}
+
+.speech-controls p {
+  margin: 0;
+}
+
+.side-by-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.side-by-side figure {
+  flex: 1 1 18rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.side-by-side img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+dialog {
+  width: min(36rem, 95vw);
+  max-height: 95vh;
+  overflow: auto;
+  border: 2px solid var(--line);
+  color: var(--text);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 60%);
+}
+
+@media (forced-colors: active) {
+  button,
+  .button {
+    border: 2px solid ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  a.button {
+    color: LinkText;
+  }
+
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+
+  .flag,
+  .notice,
+  .error,
+  .drop-zone,
+  fieldset {
+    border-color: CanvasText;
+  }
+
+  .error,
+  .notice {
+    border-left-style: solid;
+    border-left-width: 6px;
+    color: CanvasText;
+    background: Canvas;
+  }
+
+  .point-mark {
+    border-color: Canvas;
+    outline-color: CanvasText;
+  }
+}

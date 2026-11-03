@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "base.html" import profile_fields %}
+{% block title %}ChromaSense settings{% endblock %}
+{% block main %}
+<h1>Settings</h1>
+<p>These settings stay in this browser, and each change is saved right away.</p>
+<section aria-labelledby="profile-heading">
+  <h2 id="profile-heading">CVD profile</h2>
+  <form id="profile-form">
+    {{ profile_fields("settings") }}
+  </form>
+  {% if image_id %}<p><a href="/workspace/{{ image_id }}">Return to your image</a></p>{% endif %}
+</section>
+<section aria-labelledby="speech-heading">
+  <h2 id="speech-heading">Speech</h2>
+  <p>
+    <label for="speech-rate">Speech rate, from 0.5 to 2</label>
+    <input id="speech-rate" type="range" min="0.5" max="2" step="0.1" value="1">
+    <output id="speech-rate-value" for="speech-rate">1</output>
+  </p>
+  <p><label><input id="speech-auto" type="checkbox"> Read new results aloud automatically</label></p>
+  <p>Automatic reading is off by default, so that speech does not overlap a screen reader.</p>
+  <p id="speech-settings-unavailable" hidden>This browser does not support speech.</p>
+</section>
+{% endblock %}
