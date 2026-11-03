@@ -14,7 +14,7 @@ ChromaSense: AI Powered Color Accessibility Web Portal
 
 Who this specification is for, and what the build must satisfy.
 
-This specification is for Team BlindSpot, the course instructor, testers, and the agents that generate and implement the build. The build must satisfy the requirements below, which are derived from `BlindSpot_ChromaSense_SRS.md` Version 2.1, and every `must` verification must hold.
+This specification is for Team BlindSpot, the course instructor, testers, and the agents that generate and implement the build. The build must satisfy the requirements below, which are derived from `../archive/BlindSpot_ChromaSense_SRS.md` Version 2.1, and every `must` verification must hold.
 
 ## Required: Scope
 
@@ -101,7 +101,7 @@ Write one testable statement in each row. Add rows until the table lists every m
 - Priority is `must` or `should`.
 - Verification is behavior that you can see or measure and that proves the row.
 
-Each statement ends with its source in `BlindSpot_ChromaSense_SRS.md`, as a requirement ID or a section or use case number.
+Each statement ends with its source in `../archive/BlindSpot_ChromaSense_SRS.md`, as a requirement ID or a section or use case number.
 
 | ID | Statement | Priority | Verification |
 | --- | --- | --- | --- |
