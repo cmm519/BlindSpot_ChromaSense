@@ -57,8 +57,8 @@ Name each major part and its job. The agent must not add a part that is not in t
 
 - **Web UI**: Pages, styles, and browser scripts that the server delivers. Holds the CVD profile and speech settings in browser storage, plays speech, and announces results to screen readers. Sends clicks and keyboard moves as coordinates and does no pixel processing.
 - **Web API**: Humble HTTP adapter. Serves the pages and REST endpoints, assigns an anonymous session ID, checks request shape, maps requests to use case calls, and maps results and errors to responses.
-- **Application Core**: Use cases and the policy they need, organized by application action: process upload, reanalyze for profile, render view, identify color, export, interpret image, answer question, and purge expired data. Runs the pipeline, validates and verifies AI items, enforces rate limits and the spend cap, and owns the ports for storage, AI, and the clock.
-- **Color Engine**: Separate, installable Python package of pipeline filters and color rules: decode, sRGB conversion, downscale, CVD simulation, palette extraction, CIEDE2000 distance, confusion detection, masking, enhancement, pattern overlays, and color naming from the bundled dataset.
+- **Application Core**: Use cases and the policy they need, organized by application action: process upload, get analysis, reanalyze for profile, render view, identify color, export, interpret image, answer question, and purge expired data. Runs the pipeline, validates and verifies AI items, enforces rate limits and the spend cap, and owns the ports for storage, AI, and the clock.
+- **Color Engine**: Separate, installable Python package of pipeline filters and color rules: decode, sRGB conversion, downscale, palette extraction, region labeling, shape detection, local text recognition, layout analysis (image type and legend), CVD simulation, CIEDE2000 distance, confusion detection, masking, enhancement, pattern overlays, and color naming from the bundled dataset.
 - **Storage Adapter**: Implements the storage ports. Keeps temporary images on the filesystem, and keeps cached interpretations and AI usage in SQLite.
 - **AI Gateway**: Implements the AI port. Holds the provider API key, builds the provider request, and maps the provider's response or failure to plain core models. It is the only part that calls the provider.
 - **Server Main**: Composition root. Reads configuration, constructs the parts and wires them together, starts the server on port 9090, and schedules the purge of expired data.
@@ -82,15 +82,21 @@ Only Pipe and Filter pipeline code is numbered, and the number is its position i
 | 1 | `filter_1_decode` | `decode_1(data: bytes)` | `DecodedImage1` | SRS-FR-004, SRS-FR-005, SRS-FR-007 |
 | 2 | `filter_2_downscale` | `downscale_2(image: DecodedImage1, max_megapixels: float)` | `AnalysisImage2` | SRS-FR-006 |
 | 3 | `filter_3_palette` | `extract_palette_3(pixels: NDArray, color_count: int)` | `Palette3` | SRS-FR-022 |
-| 4 | `filter_4_confusion` | `detect_confusion_4(pixels: NDArray, palette: Palette3, profile: CvdProfile, threshold: float)` | `ConfusionResult4` | SRS-FR-023, SRS-FR-024, SRS-FR-025 |
-| 5 | `filter_5_enhance` | `enhance_5(pixels: NDArray, confusion: ConfusionResult4, strength: float)` | `EnhancedImage5` | SRS-FR-028, SRS-FR-029, SRS-FR-031 |
+| 4 | `filter_4_regions` | `find_regions_4(pixels: NDArray, palette: Palette3)` | `RegionMap4` | SRS-FR-065 |
+| 5 | `filter_5_shapes` | `find_shapes_5(regions: RegionMap4)` | `ShapeSet5` | SRS-FR-056 |
+| 6 | `filter_6_text` | `read_text_6(pixels: NDArray)` | `TextSet6` | SRS-FR-055 |
+| 7 | `filter_7_layout` | `analyze_layout_7(pixels: NDArray, palette: Palette3, regions: RegionMap4, text: TextSet6)` | `LayoutResult7` | SRS-FR-066, SRS-FR-067 |
+| 8 | `filter_8_confusion` | `detect_confusion_8(pixels: NDArray, palette: Palette3, profile: CvdProfile, threshold: float)` | `ConfusionResult8` | SRS-FR-023, SRS-FR-024, SRS-FR-025 |
+| 9 | `filter_9_enhance` | `enhance_9(pixels: NDArray, confusion: ConfusionResult8, strength: float)` | `EnhancedImage9` | SRS-FR-028, SRS-FR-029, SRS-FR-031 |
 
 The use cases run the filters in these orders:
 
-- **Upload with a CVD type**: 1, 2, 3, 4, 5, then 3 and 4 again on the enhanced pixels to count remaining pairs (SRS-FR-008, SRS-FR-030)
-- **Upload with no CVD**: 1, 2, 3 (SRS-FR-054)
-- **Profile change**: 4, 5, then 3 and 4 again on the enhanced pixels, using the stored palette for the first 4 (SRS-FR-014)
-- **Export**: 4 and 5 on the original pixels with the stored palette (SRS-FR-041)
+- **Upload with a CVD type**: 1, 2, 3, 4, 5, 6, 7, 8, 9, then 3 and 8 again on the enhanced pixels to count remaining pairs (SRS-FR-008, SRS-FR-030)
+- **Upload with no CVD**: 1, 2, 3, 4, 5, 6, 7 (SRS-FR-054)
+- **Profile change**: 8, 9, then 3 and 8 again on the enhanced pixels, using the stored palette for the first 8. Filters 4 to 7 do not depend on the profile and do not run again (SRS-FR-014)
+- **Export**: 8 and 9 on the original pixels with the stored palette (SRS-FR-041)
+
+Each filter can be tested on its own, and `GetAnalysis` exposes the stored results of filters 4 to 7 with no AI provider configured (SRS-FR-070).
 
 ### Color rules (Color Engine, unnumbered)
 
@@ -110,20 +116,20 @@ Each port is a `typing.Protocol`.
 - `ImageStore`: `save(record, original, working)`, `load(image_id)`, `save_analysis(image_id, analysis)`, `delete_expired(now)`
 - `InterpretationCache`: `get(image_hash, now)`, `put(interpretation)`, `delete_expired(now)`
 - `AiUsageLedger`: `record(session_id, ip_address, estimated_cost, now)`, `usage(session_id, ip_address, now)`, `total_cost(now)`
-- `VisionReader`: `read(image, palette) -> AiRead`, `ask(image, palette, items, question) -> AiAnswer`
+- `VisionReader`: `read(image, palette, image_type) -> AiRead`, `ask(image, palette, items, question) -> AiAnswer`
 - `Clock`: `now()`
 
 ### Use cases (Application Core)
 
 Each use case is one class with `execute(request) -> response`, using plain dataclasses for both.
 
-- `ProcessUpload`, `ReanalyzeForProfile`, `RenderView`, `IdentifyColor`, `ExportImage`, `InterpretImage`, `AnswerQuestion`, `PurgeExpired`
+- `ProcessUpload`, `GetAnalysis`, `ReanalyzeForProfile`, `RenderView`, `IdentifyColor`, `ExportImage`, `InterpretImage`, `AnswerQuestion`, `PurgeExpired`
 
 ### Core models and policy (Application Core)
 
 - Models: `ImageRecord`, `ImageAnalysis`, `Interpretation`, `AiRead`, `AiAnswer`, `LegendEntry`, `TextItem`, `ShapeItem`, `ColorItem`, `Verification` (enum: `VERIFIED`, `UNVERIFIED`)
 - `validate_legend(entries, palette)`
-- `verify_items(first: AiRead, second: AiRead, palette)`
+- `verify_items(read: AiRead, local: ImageAnalysis, palette)`
 - `verify_answer(answer, interpretation)`
 - `AiLimits.check(usage)`
 
@@ -140,7 +146,7 @@ Language, runtime, frameworks, and build tool.
 
 - **Language and runtime**: Python 3.11 in a Docker container, with Docker Compose and a committed dev container for development
 - **Web**: FastAPI on Uvicorn, with python-multipart for uploads, Jinja2 server-rendered pages, and plain JavaScript and CSS, with no JavaScript build step
-- **Imaging and color**: NumPy, Pillow with pillow-heif for HEIC, scikit-image for CIELAB and CIEDE2000, and scikit-learn for k-means
+- **Imaging and color**: NumPy, Pillow with pillow-heif for HEIC, scikit-image for CIELAB and CIEDE2000, scikit-learn for k-means, OpenCV (`opencv-python-headless`) for regions, shapes, layout, and overlays, and one local text recognition engine: Tesseract through pytesseract unless the recorded evaluation selects RapidOCR
 - **AI**: httpx for provider calls, behind the AI port. The provider is set in configuration and has not been chosen.
 - **Storage**: Local filesystem and SQLite through the Python standard library, on a Docker volume
 - **Speech**: The browser's Web Speech API
@@ -157,7 +163,8 @@ Rules that the agent must not break. Examples: a required library, a required fo
 - Web API, Storage Adapter, and AI Gateway hold no business rules. Color decisions, AI item verification, rate limits, and the spend cap belong in Color Engine or Application Core.
 - Only Color Engine processes pixels, on the server. The Web UI must not compute colors, names, or simulations in the browser.
 - The API key is read only by Server Main and used only by AI Gateway. It never appears in a response, page, script, or log. (SRS-NFR-007)
-- Add no text recognition library, machine learning segmentation, or image type classifier. Text and shape items come only from the vision language model.
+- Add no machine learning segmentation or trained image type classifier, and exactly one local text recognition engine. It must run with no network access and read no environment variables.
+- The AI read request must not include local text, shape, or legend results, because verification depends on the two sources being independent. Follow up questions may include them. (SRS-FR-042, SRS-FR-057)
 - A color's name and values always come from Color Engine, never from AI text. (SRS-FR-058)
 - Add no message queue, separate worker service, external database, account system, or second web framework.
 - Each filter takes plain data and returns plain data, and no filter calls another filter. Only the Application Core use case decides the order.
@@ -169,9 +176,9 @@ Record one to three decisions that you already made. Delete the unused decision 
 ### Decision 1
 
 - **Context**: ChromaSense's color rules must stay testable and replaceable while the web framework, storage, and AI provider may change. An upload also needs to run through a fixed sequence of image processing stages.
-- **Decision**: Use Clean Architecture (Robert C. Martin) for the overall structure, and Pipe and Filter for the processing pipeline. Source dependencies point inward, so the color rules and use cases do not import the web framework, storage, or AI provider. A use case runs the pipeline as a one-way sequence of independent filters: decode, downscale, palette extraction, confusion detection, and enhancement. With no CVD selected, the use case stops after palette extraction. AI interpretation is a separate use case and is not a pipeline filter.
+- **Decision**: Use Clean Architecture (Robert C. Martin) for the overall structure, and Pipe and Filter for the processing pipeline. Source dependencies point inward, so the color rules and use cases do not import the web framework, storage, or AI provider. A use case runs the pipeline as a one-way sequence of independent filters: decode, downscale, palette extraction, region labeling, shape detection, text recognition, layout analysis, confusion detection, and enhancement. With no CVD selected, the use case stops after layout analysis. AI interpretation is a separate use case and is not a pipeline filter.
 - **Rejected**: A framework-centered design with pipeline logic in web request handlers, because it would tie the color rules to the framework and make them harder to test and reuse.
-- **SRS IDs**: SRS-FR-008, SRS-FR-054, SRS-NFR-027, SRS-NFR-028, SRS-NFR-029, SRS-NFR-030, SRS-NFR-032
+- **SRS IDs**: SRS-FR-008, SRS-FR-054, SRS-FR-068, SRS-NFR-027, SRS-NFR-028, SRS-NFR-029, SRS-NFR-030, SRS-NFR-032
 
 ### Decision 2
 
@@ -182,10 +189,10 @@ Record one to three decisions that you already made. Delete the unused decision 
 
 ### Decision 3
 
-- **Context**: Users who can hardly see cannot check AI results by eye, so each item needs a trustworthy flag. Pixels can confirm colors, but text recognition is out of scope, so nothing independent can confirm text and shapes.
-- **Decision**: One Explain makes two concurrent, separate provider requests, and neither sees the other's output. AI Gateway returns each read as plain items, and Application Core compares them. A text item is verified when both reads match after normalizing case and whitespace. A shape item is verified when both reads give the same kind and palette ID. A color item is verified by its palette ID, and Color Engine supplies its name and values. A follow up answer is verified only when every item it cites is verified. Both requests count toward the rate limit and spend cap, and the cached interpretation stores the final flags.
-- **Rejected**: Showing the first read to the second request, because it would bias the second read toward agreement. Marking all text and shape items unverified, because it would give these users no signal. Adding text recognition, because the SRS rules it out for this release.
-- **SRS IDs**: SRS-FR-043, SRS-FR-044, SRS-FR-047, SRS-FR-055, SRS-FR-056, SRS-FR-057, SRS-FR-058, SRS-FR-059, SRS-FR-060, SRS-NFR-004, SRS-NFR-010, SRS-NFR-011, SRS-NFR-040
+- **Context**: Users who can hardly see cannot check AI results by eye, so each item needs a trustworthy flag. Pixels can confirm colors directly. Local computer vision and text recognition can provide independent evidence for shapes and text, at lower cost than repeated AI reads.
+- **Decision**: Filters 4 to 7 run at upload and produce local items with no AI call. One Explain makes one provider request, which receives the image, palette, and image type but no local text, shape, or legend results. AI Gateway returns the read as plain items, and Application Core compares them with the stored local analysis, one to one. A text item is verified when both sources match after normalizing case and whitespace. A shape item is verified when both sources give the same kind and palette ID. An item found by only one source stays unverified. A color item is verified by its palette ID, and Color Engine supplies its name and values. A follow up answer is verified only when every item it cites is verified. The request counts toward the rate limit and spend cap, and the cached interpretation stores the final flags.
+- **Rejected**: A second AI read, because two reads from the same kind of model can share the same mistake and it doubles cost and latency. Showing local results to the AI read, because it would bias the read toward agreement. Marking all text and shape items unverified, because it would give these users no signal.
+- **SRS IDs**: SRS-FR-043, SRS-FR-044, SRS-FR-047, SRS-FR-055, SRS-FR-056, SRS-FR-057, SRS-FR-058, SRS-FR-059, SRS-FR-060, SRS-FR-067, SRS-FR-068, SRS-NFR-004, SRS-NFR-010, SRS-NFR-011, SRS-NFR-040, SRS-NFR-042
 
 ## Required: Primary design rule
 

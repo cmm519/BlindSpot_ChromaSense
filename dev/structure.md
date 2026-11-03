@@ -23,7 +23,8 @@ ChromaSense/
 ├── README.md
 ├── docker-compose.yml
 ├── docs/
-│   └── enhancement-evaluation.md
+│   ├── enhancement-evaluation.md
+│   └── ocr-evaluation.md
 └── src/
     ├── color_engine/
     │   ├── pyproject.toml
@@ -51,12 +52,24 @@ ChromaSense/
     │   │       ├── filter_3_palette/
     │   │       │   ├── __init__.py
     │   │       │   └── extract_palette_3.py
-    │   │       ├── filter_4_confusion/
+    │   │       ├── filter_4_regions/
     │   │       │   ├── __init__.py
-    │   │       │   └── detect_confusion_4.py
-    │   │       └── filter_5_enhance/
+    │   │       │   └── find_regions_4.py
+    │   │       ├── filter_5_shapes/
+    │   │       │   ├── __init__.py
+    │   │       │   └── find_shapes_5.py
+    │   │       ├── filter_6_text/
+    │   │       │   ├── __init__.py
+    │   │       │   └── read_text_6.py
+    │   │       ├── filter_7_layout/
+    │   │       │   ├── __init__.py
+    │   │       │   └── analyze_layout_7.py
+    │   │       ├── filter_8_confusion/
+    │   │       │   ├── __init__.py
+    │   │       │   └── detect_confusion_8.py
+    │   │       └── filter_9_enhance/
     │   │           ├── __init__.py
-    │   │           └── enhance_5.py
+    │   │           └── enhance_9.py
     │   └── tests/
     │       ├── data/
     │       ├── rules/
@@ -64,8 +77,12 @@ ChromaSense/
     │           ├── test_filter_1_decode.py
     │           ├── test_filter_2_downscale.py
     │           ├── test_filter_3_palette.py
-    │           ├── test_filter_4_confusion.py
-    │           └── test_filter_5_enhance.py
+    │           ├── test_filter_4_regions.py
+    │           ├── test_filter_5_shapes.py
+    │           ├── test_filter_6_text.py
+    │           ├── test_filter_7_layout.py
+    │           ├── test_filter_8_confusion.py
+    │           └── test_filter_9_enhance.py
     └── portal/
         ├── pyproject.toml
         ├── chromasense/
@@ -83,6 +100,7 @@ ChromaSense/
         │   │       ├── __init__.py
         │   │       ├── answer_question.py
         │   │       ├── export_image.py
+        │   │       ├── get_analysis.py
         │   │       ├── identify_color.py
         │   │       ├── interpret_image.py
         │   │       ├── process_upload.py
@@ -151,15 +169,16 @@ One row for each top-level folder or important file. The part must be a name fro
 | `.devcontainer/` | Server Main | Team dev container |
 | `.github/workflows/ci.yml` | Server Main | Required pull request checks: lint, dependency rules, tests, and coverage |
 | `.env.example` | Server Main | Configuration names with no real values: provider URL, API key, model, retention period, confusion threshold, rate limits, and spend cap |
-| `Dockerfile` | Server Main | Multi-stage build with `engine-test`, `dev`, and `runtime` targets |
+| `Dockerfile` | Server Main | Multi-stage build with `engine-test`, `dev`, and `runtime` targets. Each target installs the selected local text recognition engine |
 | `docker-compose.yml` | Server Main | `portal` service on port 9090, `dev` service for checks, and the data volume |
 | `README.md` | Server Main | Setup guide, and how to start the portal and reach it from another LAN device |
 | `docs/enhancement-evaluation.md` | Color Engine | Recorded result of the enhancement method evaluation |
+| `docs/ocr-evaluation.md` | Color Engine | Recorded comparison of Tesseract and RapidOCR on the labeled test set, and the selected engine |
 | `src/color_engine/pyproject.toml` | Color Engine | Package definition with no web framework dependency, and coverage settings |
 | `src/color_engine/color_engine/models.py` | Color Engine | `CvdType`, `CvdProfile`, `ColorInfo`, and numbered filter output classes |
 | `src/color_engine/color_engine/data/` | Color Engine | Machado coefficients and the bundled named color dataset |
 | `src/color_engine/color_engine/rules/` | Color Engine | Unnumbered color rules shared by filters and use cases |
-| `src/color_engine/color_engine/pipeline/` | Color Engine | The five numbered filters, one directory each |
+| `src/color_engine/color_engine/pipeline/` | Color Engine | The nine numbered filters, one directory each |
 | `src/color_engine/tests/` | Color Engine | Engine tests that run without the portal or web framework |
 | `src/portal/pyproject.toml` | Server Main | Portal dependencies, the import-linter contracts, and Ruff settings |
 | `src/portal/chromasense/core/ports.py` | Application Core | Port protocols that outer parts implement |
@@ -191,7 +210,13 @@ Use these where a requirement or decision already depends on them. The agent mus
 | `scikit-learn` | `sklearn.cluster.KMeans` with a fixed `random_state`, on a pixel sample | `filter_3_palette` | SRS-FR-022, SRS-NFR-003 |
 | `scikit-image` | `skimage.color.rgb2lab`, `skimage.color.lab2rgb` | `filter_3_palette`, `rules/naming.py` | SRS-FR-022, SRS-FR-036 |
 | `scikit-image` | `skimage.color.deltaE_ciede2000` | `rules/distance.py` | SRS-FR-023, SRS-FR-036 |
-| `numpy` | Array math, boolean masks, and matrix multiplication | Filters and `rules/` | SRS-FR-018, SRS-FR-025, SRS-FR-028 |
+| `numpy` | Array math, boolean masks, and matrix multiplication | Filters and `rules/` | SRS-FR-018, SRS-FR-025, SRS-FR-028, SRS-FR-065 |
+| `opencv-python-headless` | `cv2.morphologyEx`, `cv2.connectedComponentsWithStats` | `filter_4_regions` | SRS-FR-065 |
+| `opencv-python-headless` | `cv2.findContours`, `cv2.approxPolyDP`, `cv2.moments`, `cv2.HoughCircles` | `filter_5_shapes` | SRS-FR-056 |
+| `opencv-python-headless` | `cv2.cvtColor`, `cv2.resize`, `cv2.adaptiveThreshold` for text recognition input | `filter_6_text` | SRS-FR-055 |
+| `pytesseract` | `pytesseract.image_to_data` for text, boxes, and confidence. RapidOCR replaces it only if `docs/ocr-evaluation.md` records that result | `filter_6_text` | SRS-FR-055, SRS-NFR-042 |
+| `opencv-python-headless` | `cv2.calcHist`, `cv2.Canny`, `cv2.HoughLines` | `filter_7_layout` | SRS-FR-066, SRS-FR-067 |
+| `opencv-python-headless` | `cv2.line`, `cv2.circle`, `cv2.bitwise_and` | `rules/overlay.py` | SRS-FR-033 |
 | Standard library | `colorsys.rgb_to_hls`, `csv`, `importlib.resources` | `rules/naming.py` | SRS-FR-036, SRS-FR-037 |
 
 ### Portal
@@ -199,7 +224,6 @@ Use these where a requirement or decision already depends on them. The agent mus
 | Library | Use these | In | SRS IDs |
 | --- | --- | --- | --- |
 | Standard library | `dataclasses.dataclass`, `typing.Protocol`, `hashlib.sha256` | `core/` | SRS-FR-047 |
-| Standard library | `concurrent.futures.ThreadPoolExecutor` for the two reads | `core/use_cases/interpret_image.py` | SRS-FR-057, SRS-NFR-004 |
 | Standard library | `sqlite3.connect` | `storage/` | SRS-FR-047, SRS-FR-048, SRS-NFR-010, SRS-NFR-011 |
 | Standard library | `pathlib.Path` | `storage/filesystem_image_store.py` | SRS-FR-010 |
 | `httpx` | `httpx.Client` | `ai_gateway/http_vision_reader.py` | SRS-FR-046 |
@@ -250,7 +274,8 @@ Checks for this stack. The implementation agent uses this list before it invents
 
 1. Docker: confirm that the Docker daemon is running, that the base image is Python 3.11, and that the `Dockerfile` target names match `docker-compose.yml`.
 2. Install order: confirm that the image installs `src/color_engine` before `src/portal`, and that `src/color_engine/pyproject.toml` lists `data/*` as package data. `pillow-heif` must have a wheel for the image's platform.
-3. Imports: if `lint-imports` fails, fix the import that points outward. Do not edit the contract. Numbered directories must keep the `filter_<N>_<name>` form, because names such as `1-decode` cannot be imported.
-4. Port: if the portal does not open, confirm that port 9090 is free, that the server binds `0.0.0.0`, and that the host firewall allows it.
-5. Line endings: this repo is developed on Windows. If a file copied into the image fails with a bad interpreter or `\r` error, convert that file to LF.
-6. AI: a missing provider setting must not stop the build or startup. Only AI features report that they are unavailable.
+3. Text recognition: confirm that the selected engine and its English language data are installed in every image target, and that `filter_6_text` needs no network access. OpenCV arrays in this project stay in RGB order, so pass explicit `COLOR_RGB2*` codes to `cv2.cvtColor`.
+4. Imports: if `lint-imports` fails, fix the import that points outward. Do not edit the contract. Numbered directories must keep the `filter_<N>_<name>` form, because names such as `1-decode` cannot be imported.
+5. Port: if the portal does not open, confirm that port 9090 is free, that the server binds `0.0.0.0`, and that the host firewall allows it.
+6. Line endings: this repo is developed on Windows. If a file copied into the image fails with a bad interpreter or `\r` error, convert that file to LF.
+7. AI: a missing provider setting must not stop the build or startup. Only AI features report that they are unavailable.
