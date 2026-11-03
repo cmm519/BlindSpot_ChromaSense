@@ -198,8 +198,5 @@ Record one to three decisions that you already made. Delete the unused decision 
 
 During implementation, the agent may read one book rule file. That file biases how the agent writes code inside the boundaries above. It is not a second architecture.
 
-Write one path that ends in `.mini.md`, or write `none`. Do not list two books. Example: `user resources/agent-rules-books/clean-code/clean-code.mini.md`.
 
-Before you select, read `user resources/HOW-TO-agent-rules-books.md` and `user resources/ARCHITECTURE-NOTES.md`.
-
-clean-architecture.mini.md
+- /dev.clean-architecture.mini.md
